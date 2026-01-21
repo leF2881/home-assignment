@@ -1,17 +1,19 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-
-import App from "./App.tsx";
-import { Provider } from "./provider.tsx";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
+import {store} from './app/store'
+import App from './App';
 import "@/styles/globals.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Provider>
-        <App />
-      </Provider>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+          <div className="dark text-foreground bg-background min-h-screen">
+            <App />
+          </div>
+      </BrowserRouter>
+    </Provider>
   </React.StrictMode>,
 );

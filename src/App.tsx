@@ -1,20 +1,20 @@
-import { Route, Routes } from "react-router-dom";
-
-import IndexPage from "@/pages/index";
-import DocsPage from "@/pages/docs";
-import PricingPage from "@/pages/pricing";
-import BlogPage from "@/pages/blog";
-import AboutPage from "@/pages/about";
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
   return (
-    <Routes>
-      <Route element={<IndexPage />} path="/" />
-      <Route element={<DocsPage />} path="/docs" />
-      <Route element={<PricingPage />} path="/pricing" />
-      <Route element={<BlogPage />} path="/blog" />
-      <Route element={<AboutPage />} path="/about" />
-    </Routes>
+    <div className="min-h-screen">
+      <Routes>
+        <Route path="/" element={
+          <div className="flex items-center justify-center h-screen">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold mb-4">SOC Incident Dashboard</h1>
+              <p className="text-gray-400">Setting up...</p>
+            </div>
+          </div>
+        } />
+      </Routes>
+    </div>
+
   );
 }
 
