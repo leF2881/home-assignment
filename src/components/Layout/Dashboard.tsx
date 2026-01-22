@@ -1,18 +1,22 @@
-import { useEffect } from "react";
-import Header from "./Header";
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { selectAllIncidents ,fetchIncidents} from "../../features/incidents/incidentsSlice";
-export default function Dashboard() {
-  const incidents = useAppSelector(selectAllIncidents);
-  const dispatch=useAppDispatch()
-useEffect(() => {
-  dispatch(fetchIncidents());
-}, [dispatch]);
+import SummaryCards from "@/features/incidents/components/SummaryCards";
+import IncidentsTable from "@/features/incidents/components/IncidentsTable";
+import { Card } from "@heroui/react";
 
+export default function Dashboard() {
   return (
-    <>
-      <Header />
-     {incidents.map(item=><div key={item.id} className="text-white">{item.id}</div>)}
-    </>
+    <div className="min-h-screen bg-background px-6 py-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <SummaryCards />
+        <Card className="bg-content1 border-divider">
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4">
+              Active Incidents
+            </h3>
+            <IncidentsTable />
+          </div>
+        </Card>
+
+      </div>
+    </div>
   );
 }

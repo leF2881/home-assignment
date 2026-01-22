@@ -67,27 +67,36 @@ export default function Header() {
 
           <Card>
             <CardBody>
-            <Dropdown placement="bottom-start" >
-        <DropdownTrigger>
-          <User
-            as="button"
-            avatarProps={{
-              isBordered: true,
-              src: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-            }}
-            className="transition-transform"
-            name={username && username[0].toUpperCase() + username.slice(1)}
-          />
-        </DropdownTrigger>
-        <DropdownMenu aria-label="User Actions" variant="flat">
-          <DropdownItem key="settings">My Settings</DropdownItem>
-          <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
-          <DropdownItem key="logout" color="danger" onClick={handleLogout}>
-            <p className="font-bold">Log Out</p>
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown></CardBody>
-        </Card>
+              <Dropdown placement="bottom-start">
+                <DropdownTrigger>
+                  <User
+                    as="button"
+                    avatarProps={{
+                      isBordered: true,
+                      src: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
+                    }}
+                    className="transition-transform"
+                    name={
+                      username && username[0].toUpperCase() + username.slice(1)
+                    }
+                  />
+                </DropdownTrigger>
+                <DropdownMenu aria-label="User Actions" variant="flat">
+                  <DropdownItem key="settings">My Settings</DropdownItem>
+                  <DropdownItem key="help_and_feedback">
+                    Help & Feedback
+                  </DropdownItem>
+                  <DropdownItem
+                    key="logout"
+                    color="danger"
+                    onClick={handleLogout}
+                  >
+                    <p className="font-bold">Log Out</p>
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </CardBody>
+          </Card>
         </div>
       </div>
     </header>
