@@ -7,12 +7,11 @@ import {
   setCategories,
   setSearchSource,
   setSortField,
-  setSortOrder,
   setFiltersFromURL,
   resetFilters,
 } from './filterSlice';
 import { Severity, Status, Category } from '@/types/incident';
-import { SortField, SortOrder } from './filterSlice';
+import { SortField } from './filterSlice';
 
 export function useURLSync() {
   const dispatch = useAppDispatch();
@@ -29,10 +28,18 @@ export function useURLSync() {
     const statuses = searchParams.get('statuses')?.split(',').filter(Boolean) as Status[] | undefined;
     const categories = searchParams.get('categories')?.split(',').filter(Boolean) as Category[] | undefined;
     const searchSource = searchParams.get('search') || '';
-    const sortField = (searchParams.get('sortField') as SortField) || 'timestamp';
-    const sortOrder = (searchParams.get('sortOrder') as SortOrder) || 'desc';
+    const sortFieldParam = searchParams.get('sortField') as SortField;
+    const sortField = sortFieldParam || 'timestamp';
 
-    if (severities || statuses || categories || searchSource || sortField || sortOrder) {
+    // Check if there are any URL params to load
+    const hasURLParams = 
+      (severities && severities.length > 0) ||
+      (statuses && statuses.length > 0) ||
+      (categories && categories.length > 0) ||
+      searchSource ||
+      sortFieldParam;
+
+    if (hasURLParams) {
       isUpdatingFromURL.current = true;
       dispatch(setFiltersFromURL({
         severities: severities || [],
@@ -40,11 +47,17 @@ export function useURLSync() {
         categories: categories || [],
         searchSource,
         sortField,
-        sortOrder,
       }));
+      // Reset the flag after state update completes
+      setTimeout(() => {
+        isUpdatingFromURL.current = false;
+      }, 0);
+    } else {
+      // No URL params, so we can immediately allow URL updates
+      isUpdatingFromURL.current = false;
     }
     isInitialMount.current = false;
-  }, []); // Only on mount
+  }, []); // Only on mount - searchParams is stable from useSearchParams
 
   // Update URL when filters change (but not when updating from URL)
   useEffect(() => {
@@ -53,7 +66,6 @@ export function useURLSync() {
     }
 
     if (isUpdatingFromURL.current) {
-      // Don't reset the flag here - let handleResetFilters handle it
       return;
     }
 
@@ -71,9 +83,8 @@ export function useURLSync() {
     if (filters.searchSource) {
       params.set('search', filters.searchSource);
     }
-    if (filters.sortField !== 'timestamp' || filters.sortOrder !== 'desc') {
+    if (filters.sortField !== 'timestamp') {
       params.set('sortField', filters.sortField);
-      params.set('sortOrder', filters.sortOrder);
     }
 
     // Only update if params actually changed
@@ -94,7 +105,6 @@ export function useURLSync() {
     filters.categories,
     filters.searchSource,
     filters.sortField,
-    filters.sortOrder,
     searchParams,
     setSearchParams,
   ]);
@@ -102,8 +112,10 @@ export function useURLSync() {
   const handleResetFilters = () => {
     // Reset filters in state first
     dispatch(resetFilters());
-    // Clear URL params - the useEffect will handle this, but we do it immediately too
+    // Clear URL params immediately
     setSearchParams(new URLSearchParams(), { replace: true });
+    // Reset the flag to allow future URL updates
+    isUpdatingFromURL.current = false;
   };
 
   return {
@@ -113,7 +125,6 @@ export function useURLSync() {
     setCategories: (categories: Category[]) => dispatch(setCategories(categories)),
     setSearchSource: (search: string) => dispatch(setSearchSource(search)),
     setSortField: (field: SortField) => dispatch(setSortField(field)),
-    setSortOrder: (order: SortOrder) => dispatch(setSortOrder(order)),
     resetFilters: handleResetFilters,
   };
 }

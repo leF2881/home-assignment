@@ -52,13 +52,14 @@ export const selectFilteredIncidents = createSelector(
 
       if (filters.sortField === 'timestamp') {
         comparison =
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
       } else if (filters.sortField === 'severity') {
         comparison =
           severityOrder[a.severity] - severityOrder[b.severity];
       }
 
-      return filters.sortOrder === 'asc' ? -comparison : comparison;
+      const order = filters.sortOrder || 'desc';
+      return order === 'asc' ? comparison : -comparison;
     });
 
     return filtered;

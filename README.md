@@ -41,8 +41,8 @@ Dashboard:
 1. Clone the repository
 
 ```bash
-git clone https://github.com/leF2881/frontend-home-assignment.git
-cd frontend-home-assignment
+git clone https://github.com/leF2881/home-assignment
+cd home-assignment
 ```
 
 2. Install dependencies

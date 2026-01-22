@@ -10,7 +10,6 @@ export interface FilterState {
   categories: Category[];
   searchSource: string;
   sortField: SortField;
-  sortOrder: SortOrder;
 }
 
 const initialState: FilterState = {
@@ -19,7 +18,6 @@ const initialState: FilterState = {
   categories: [],
   searchSource: '',
   sortField: 'timestamp',
-  sortOrder: 'desc',
 };
 
 const filterSlice = createSlice({
@@ -41,16 +39,13 @@ const filterSlice = createSlice({
     setSortField: (state, action: PayloadAction<SortField>) => {
       state.sortField = action.payload;
     },
-    setSortOrder: (state, action: PayloadAction<SortOrder>) => {
-      state.sortOrder = action.payload;
-    },
+
     resetFilters: (state) => {
       state.severities = [];
       state.statuses = [];
       state.categories = [];
       state.searchSource = '';
       state.sortField = 'timestamp';
-      state.sortOrder = 'desc';
     },
     setFiltersFromURL: (state, action: PayloadAction<Partial<FilterState>>) => {
       return { ...state, ...action.payload };
@@ -64,7 +59,6 @@ export const {
   setCategories,
   setSearchSource,
   setSortField,
-  setSortOrder,
   resetFilters,
   setFiltersFromURL,
 } = filterSlice.actions;
@@ -76,18 +70,15 @@ export const selectStatuses = (state: { filter: FilterState }) => state.filter.s
 export const selectCategories = (state: { filter: FilterState }) => state.filter.categories;
 export const selectSearchSource = (state: { filter: FilterState }) => state.filter.searchSource;
 export const selectSortField = (state: { filter: FilterState }) => state.filter.sortField;
-export const selectSortOrder = (state: { filter: FilterState }) => state.filter.sortOrder;
 
 // Helper selector to check if any filters are active
 export const selectHasActiveFilters = (state: { filter: FilterState }) => {
-  const { severities, statuses, categories, searchSource, sortField, sortOrder } = state.filter;
+  const { severities, statuses, categories, searchSource } = state.filter;
   return (
     severities.length > 0 ||
     statuses.length > 0 ||
     categories.length > 0 ||
-    searchSource.length > 0 ||
-    sortField !== 'timestamp' ||
-    sortOrder !== 'desc'
+    searchSource.length > 0
   );
 };
 
