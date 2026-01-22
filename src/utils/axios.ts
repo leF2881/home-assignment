@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 // Create axios instance
 const axiosInstance = axios.create({
   baseURL: '/api',
@@ -72,7 +71,6 @@ axiosInstance.interceptors.response.use(
         
         const { access_token } = response.data;
         localStorage.setItem('access_token', access_token);
-        
         // Update the failed request with new token
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
         originalRequest.headers.Authorization = `Bearer ${access_token}`;

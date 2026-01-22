@@ -10,6 +10,10 @@ export type Category =
 
 export type Status = 'OPEN' | 'RESOLVED' | 'ESCALATED';
 
+export interface GetIncidentsResponse {
+  incidents: Incident[];
+}
+
 export interface Incident {
   id: string;
   severity: Severity;
@@ -39,5 +43,6 @@ export interface LoginCredentials {
 }
 
 export interface AuthResponse {
+  [x: string]: string;
   access_token: string;
 }

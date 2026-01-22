@@ -15,7 +15,7 @@ const initialState: AuthState = {
   isAuthenticated: !!localStorage.getItem('access_token'),
   isLoading: false,
   error: null,
-  username: null,
+  username: localStorage.getItem("username"),
 };
 
 // Async thunks
@@ -24,7 +24,7 @@ export const login = createAsyncThunk(
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
       const data = await authAPI.login(credentials);
-      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('access_token', data.accessToken);
       return { token: data.access_token, username: credentials.username };
     } catch (error: any) {
       const message = error.response?.data?.detail || 'Login failed';
@@ -61,6 +61,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.username = null;
       localStorage.removeItem('access_token');
+      localStorage.removeItem("username");
     },
   },
   extraReducers: (builder) => {
@@ -74,6 +75,7 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.token = action.payload.token;
       state.username = action.payload.username;
+      localStorage.setItem("username", action.payload.username);
       state.error = null;
     });
     builder.addCase(login.rejected, (state, action) => {
