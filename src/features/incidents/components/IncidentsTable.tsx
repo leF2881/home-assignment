@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import {
   Table,
   TableHeader,
@@ -9,7 +9,9 @@ import {
   Chip,
   Button,
   Spinner,
+  Alert,
 } from '@heroui/react';
+import { motion } from 'framer-motion';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
   fetchIncidents,
@@ -41,6 +43,44 @@ export default function IncidentsTable() {
   const incidents = useAppSelector(selectAllIncidents);
   const loading = useAppSelector(selectIncidentsLoading);
   const error = useAppSelector(selectIncidentsError);
+  const [seenCriticalIds, setSeenCriticalIds] = useState<Set<string>>(new Set());
+  const [showAlert, setShowAlert] = useState(false);
+  const isInitialLoad = useRef(true);
+
+  const criticalIncidents = useMemo(() => {
+    return incidents.filter(incident => incident.severity === 'CRITICAL');
+  }, [incidents]);
+
+  // Track new critical incidents
+  useEffect(() => {
+    if (isInitialLoad.current) {
+      // On initial load, mark all existing critical incidents as seen
+      const criticalIds = new Set(
+        criticalIncidents.map(incident => incident.id)
+      );
+      setSeenCriticalIds(criticalIds);
+      isInitialLoad.current = false;
+      return;
+    }
+
+    // Check for new critical incidents
+    const newCriticalIncidents = criticalIncidents.filter(
+      incident => !seenCriticalIds.has(incident.id)
+    );
+
+    if (newCriticalIncidents.length > 0) {
+      // Mark new critical incidents as seen
+      setSeenCriticalIds(prev => {
+        const updated = new Set(prev);
+        newCriticalIncidents.forEach(incident => {
+          updated.add(incident.id);
+        });
+        return updated;
+      });
+      // Show alert for new critical incidents
+      setShowAlert(true);
+    }
+  }, [criticalIncidents, seenCriticalIds]);
 
   useEffect(() => {
     dispatch(fetchIncidents());
@@ -93,15 +133,27 @@ export default function IncidentsTable() {
 
     switch (columnKey) {
       case 'severity':
+        const isCritical = incident.severity === 'CRITICAL';
         return (
-          <Chip
-            color={severityColors[incident.severity]}
-            size="sm"
-            variant="flat"
-            className="font-semibold"
+          <motion.div
+            animate={isCritical ? {
+              scale: [1, 1.1, 1],
+            } : {}}
+            transition={isCritical ? {
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            } : {}}
           >
-            {incident.severity}
-          </Chip>
+            <Chip
+              color={severityColors[incident.severity]}
+              size="sm"
+              variant="flat"
+              className="font-semibold"
+            >
+              {incident.severity}
+            </Chip>
+          </motion.div>
         );
 
       case 'status':
@@ -240,6 +292,17 @@ export default function IncidentsTable() {
 
   return (
     <div className="space-y-4">
+      {/* Critical Incidents Alert - Only for new critical incidents */}
+      {showAlert && criticalIncidents.length > 0 && (
+        <Alert
+          color="danger"
+          variant="flat"
+          title="Critical Incident Detected"
+          description={`New critical incident${criticalIncidents.length !== 1 ? 's' : ''} require immediate attention`}
+          onClose={() => setShowAlert(false)}
+        />
+      )}
+
       {/* Desktop Table */}
       <div className="hidden lg:block">
         <Table
@@ -324,14 +387,36 @@ export default function IncidentsTable() {
               {/* Header Row */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex gap-2 flex-wrap">
-                  <Chip
-                    color={severityColors[incident.severity]}
-                    size="sm"
-                    variant="flat"
-                    className="font-semibold"
-                  >
-                    {incident.severity}
-                  </Chip>
+                  {isCritical ? (
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.1, 1],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      <Chip
+                        color={severityColors[incident.severity]}
+                        size="sm"
+                        variant="flat"
+                        className="font-semibold"
+                      >
+                        {incident.severity}
+                      </Chip>
+                    </motion.div>
+                  ) : (
+                    <Chip
+                      color={severityColors[incident.severity]}
+                      size="sm"
+                      variant="flat"
+                      className="font-semibold"
+                    >
+                      {incident.severity}
+                    </Chip>
+                  )}
                   <Chip
                     color={statusColors[incident.status]}
                     size="sm"
