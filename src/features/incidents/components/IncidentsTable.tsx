@@ -22,6 +22,7 @@ import {
   startOptimisticUpdate,
   revertOptimisticUpdate,
 } from '../incidentsSlice';
+import { selectFilteredIncidents } from '@/features/filter/filterSelectors';
 import { Incident } from '@/types/incident';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -40,7 +41,8 @@ const statusColors = {
 
 export default function IncidentsTable() {
   const dispatch = useAppDispatch();
-  const incidents = useAppSelector(selectAllIncidents);
+  const allIncidents = useAppSelector(selectAllIncidents);
+  const incidents = useAppSelector(selectFilteredIncidents);
   const loading = useAppSelector(selectIncidentsLoading);
   const error = useAppSelector(selectIncidentsError);
   const [seenCriticalIds, setSeenCriticalIds] = useState<Set<string>>(new Set());
@@ -48,8 +50,8 @@ export default function IncidentsTable() {
   const isInitialLoad = useRef(true);
 
   const criticalIncidents = useMemo(() => {
-    return incidents.filter(incident => incident.severity === 'CRITICAL');
-  }, [incidents]);
+    return allIncidents.filter(incident => incident.severity === 'CRITICAL');
+  }, [allIncidents]);
 
   // Track new critical incidents
   useEffect(() => {

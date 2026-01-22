@@ -1,5 +1,6 @@
 import SummaryCards from "@/features/incidents/components/SummaryCards";
 import IncidentsTable from "@/features/incidents/components/IncidentsTable";
+import FilterControls from "@/features/filter/components/FilterControls";
 import { Card } from "@heroui/react";
 
 export default function Dashboard() {
@@ -12,6 +13,9 @@ export default function Dashboard() {
             <h3 className="text-lg font-semibold text-foreground mb-4">
               Active Incidents
             </h3>
+            <div className="mb-6">
+              <FilterControls />
+            </div>
             <IncidentsTable />
           </div>
         </Card>
