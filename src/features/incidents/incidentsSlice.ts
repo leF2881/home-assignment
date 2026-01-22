@@ -3,6 +3,7 @@ import {
   createAsyncThunk,
   createEntityAdapter,
   PayloadAction,
+  createSelector
 } from "@reduxjs/toolkit";
 import { incidentsAPI } from "./incidentsAPI";
 import { Incident, IncidentUpdate } from "@/types/incident";
@@ -72,7 +73,6 @@ export const createTestIncident = createAsyncThunk(
     }
   },
 );
-
 const incidentsSlice = createSlice({
   name: "incidents",
   initialState,
@@ -101,7 +101,6 @@ const incidentsSlice = createSlice({
       }
     },
 
-    // Optimistic update failed - revert
     revertOptimisticUpdate: (
       state,
       action: PayloadAction<{
@@ -118,7 +117,6 @@ const incidentsSlice = createSlice({
         incident.error = error;
       }
     },
-
     // Clear incident error
     clearIncidentError: (state, action: PayloadAction<string>) => {
       const incident = state.entities[action.payload];
@@ -194,17 +192,17 @@ export const selectIncidentsLoading = (state: RootState) =>
   state.incidents.loading;
 export const selectIncidentsError = (state: RootState) => state.incidents.error;
 
-// Computed selectors
-export const selectSeverityCounts = (state: RootState) => {
-  const incidents = selectAllIncidents(state);
-  return incidents.reduce(
-    (acc, incident) => {
+// createSelector memoizes computed selector results to avoid unnecessary rerenders
+
+export const selectSeverityCounts = createSelector(
+  [selectAllIncidents],
+  (incidents) => {
+    return incidents.reduce((acc, incident) => {
       acc[incident.severity] = (acc[incident.severity] || 0) + 1;
       return acc;
-    },
-    {} as Record<string, number>,
-  );
-};
+    }, {} as Record<string, number>);
+  }
+);
 
 export const selectIncidentsBySeverity =
   (severity: string) => (state: RootState) => {

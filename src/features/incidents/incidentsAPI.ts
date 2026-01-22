@@ -1,9 +1,9 @@
-import axios from "@/utils/axios";
+import axiosInstance from "@/utils/axios";
 import { CreateTestIncident, Incident, IncidentUpdate ,GetIncidentsResponse} from "@/types/incident";
 
 export const incidentsAPI = {
   getIncidents: async (): Promise<Incident[]> => {
-    const response = await axios.get<GetIncidentsResponse>("/incidents");
+    const response = await axiosInstance.get<GetIncidentsResponse>("/incidents");
     return response.data.incidents;
   },
 
@@ -11,14 +11,14 @@ export const incidentsAPI = {
     id: string,
     update: IncidentUpdate,
   ): Promise<Incident> => {
-    const response = await axios.patch(`/incidents/${id}`, update);
+    const response = await axiosInstance.patch(`/incidents/${id}`, update);
     return response.data;
   },
   //for developer
   createTestIncident: async (
     incident: CreateTestIncident,
   ): Promise<Incident> => {
-    const response = await axios.post<Incident>("/incidents/test", incident);
+    const response = await axiosInstance.post<Incident>("/incidents/test", incident);
     return response.data;
   },
 };

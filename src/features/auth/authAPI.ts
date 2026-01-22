@@ -1,24 +1,26 @@
-import axios from "@/utils/axios";
-import { LoginCredentials, AuthResponse } from "@/types/incident";
+// authAPI.ts
+import axiosInstance from '@/utils/axios';
 
 export const authAPI = {
-  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const response = await axios.post<AuthResponse>("/auth/login", credentials);
-    return response.data;
-  },
-  refresh: async (): Promise<AuthResponse> => {
-    const response = await axios.post<AuthResponse>("/auth/refresh", {});
-    return response.data;
+  login: async (credentials: { username: string; password: string }) => {
+    const res = await axiosInstance.post('/auth/login', credentials, {
+      skipAuth: true,
+    } as any);
+    return res.data;
   },
 
-  logout: async (): Promise<void> => {
-    try {
-      await axios.post("/auth/logout", {});
-    } catch (error) {
-      // Even if logout fails on backend, we clear local storage
-      console.error("Logout error:", error);
-    } finally {
-      localStorage.removeItem("access_token");
-    }
+refresh: async (accessToken: string) => {
+    const res = await axiosInstance.post(
+      '/auth/refresh',
+      { accessToken },
+      { skipAuth: true } as any 
+    );
+    return res.data;
+  },
+
+  logout: async () => {
+    const res = await axiosInstance.post('/auth/logout', {}, {
+    });
+    return res.data;
   },
 };
